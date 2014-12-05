@@ -47,7 +47,7 @@ class Emoji
         $index = $this->getIndex();
 
         // Build the format string for the <img>
-        $htmlFormat = '<img src=":%s:" class="emoji" src="' . $this->assetUrlFormat . '">';
+        $htmlFormat = '<img alt=":%s:" class="emoji" src="' . $this->assetUrlFormat . '">';
 
         // NB: Named emoji should be replaced first as the string will then contain them in the image alt tags
 
