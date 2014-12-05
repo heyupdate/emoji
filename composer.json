@@ -1,0 +1,23 @@
+{
+    "name": "heyupdate/emoji",
+    "description": "Convert unicode and named (i.e. :smile:) Emoji into images",
+    "keywords": ["emoji"],
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HeyUpdate\\Emoji\\": "src/HeyUpdate/Emoji"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    }
+}
