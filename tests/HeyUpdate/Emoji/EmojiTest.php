@@ -23,4 +23,14 @@ class EmojiTest extends \PHPUnit_Framework_TestCase
         $replacedString = $this->emoji->replaceEmojiWithImages('Merry Christmas :santa:');
         $this->assertEquals('Merry Christmas <img alt=":santa:" class="emoji" src="http://twemoji.maxcdn.com/36x36/1f385.png">', $replacedString);
     }
+
+    public function testCountEmojiWithoutAnyEmoji()
+    {
+        $this->assertEquals(0, $this->emoji->countEmoji('This does not contain any emoji'));
+    }
+
+    public function testCountEmojiWithEmoji()
+    {
+        $this->assertEquals(3, $this->emoji->countEmoji('Three emoji for you! ❤❤ :smile:'));
+    }
 }

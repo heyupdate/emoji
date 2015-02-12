@@ -67,4 +67,11 @@ class Emoji
 
         return $string;
     }
+
+    public function countEmoji($string)
+    {
+        $index = $this->getIndex();
+
+        return preg_match_all($index->getEmojiNameRegex(), $string) + preg_match_all($index->getEmojiUnicodeRegex(), $string);
+    }
 }
