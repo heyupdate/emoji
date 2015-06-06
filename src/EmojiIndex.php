@@ -37,7 +37,7 @@ class EmojiIndex
     public function __construct()
     {
         // TODO: Make the index file configurable
-        $this->configFile = __DIR__ . '/../../../config/index.json';
+        $this->configFile = __DIR__ . '/../config/index.json';
 
         $this->loadConfig();
     }
