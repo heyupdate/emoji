@@ -33,4 +33,11 @@ class EmojiTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(3, $this->emoji->countEmoji('Three emoji for you! ❤❤ :smile:'));
     }
+
+    public function testEmojiReplacesNamedEmojiWithMacros()
+    {
+        $replacedString = $this->emoji->replaceEmojiWithMacros('❤');
+        $this->assertEquals(':heart:', $replacedString);
+    }
+
 }
