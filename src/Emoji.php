@@ -2,52 +2,75 @@
 
 namespace HeyUpdate\Emoji;
 
+use HeyUpdate\Emoji\Index\IndexInterface;
+
 class Emoji
 {
     /**
-     * @var EmojiIndex
+     * @var IndexInterface
      */
     protected $index;
 
     /**
-     * The sprintf format used to generate the asset URLs, e.g. "http://emojis.com/16x16/%s.png"
+     * The sprintf format used to generate the asset URLs, e.g. "http://emojis.com/16x16/%s.png".
      *
      * @var string
      */
     protected $assetUrlFormat;
 
-    public function __construct(EmojiIndex $index, $assetUrlFormat)
+    /**
+     * @param IndexInterface $index
+     * @param string         $assetUrlFormat
+     */
+    public function __construct(IndexInterface $index, $assetUrlFormat)
     {
         $this->setIndex($index);
         $this->setAssetUrlFormat($assetUrlFormat);
     }
 
+    /**
+     * @return string
+     */
     public function getAssetUrlFormat()
     {
         return $this->assetUrlFormat;
     }
 
+    /**
+     * @param string $assetUrlFormat
+     */
     public function setAssetUrlFormat($assetUrlFormat)
     {
         $this->assetUrlFormat = $assetUrlFormat;
     }
 
+    /**
+     * @return IndexInterface
+     */
     public function getIndex()
     {
         return $this->index;
     }
 
-    public function setIndex(EmojiIndex $index)
+    /**
+     * @param IndexInterface $index
+     */
+    public function setIndex(IndexInterface $index)
     {
         $this->index = $index;
     }
 
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
     public function replaceEmojiWithImages($string)
     {
         $index = $this->getIndex();
 
         // Build the format string for the <img>
-        $htmlFormat = '<img alt=":%s:" class="emoji" src="' . $this->assetUrlFormat . '">';
+        $htmlFormat = '<img alt=":%s:" class="emoji" src="'.$this->getAssetUrlFormat().'">';
 
         // NB: Named emoji should be replaced first as the string will then contain them in the image alt tags
 
@@ -68,6 +91,11 @@ class Emoji
         return $string;
     }
 
+    /**
+     * @param string string
+     *
+     * @return string
+     */
     public function replaceNamedWithUnicode($string)
     {
         $index = $this->getIndex();
@@ -75,10 +103,15 @@ class Emoji
         return preg_replace_callback($index->getEmojiNameRegex(), function ($matches) use ($index) {
             $emoji = $index->findByName($matches[1]);
 
-            return $index->convertUnicodeToString($emoji['unicode']);
+            return UnicodeUtil::convertUnicodeToString($emoji['unicode']);
         }, $string);
     }
 
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
     public function replaceUnicodeWithNamed($string)
     {
         $index = $this->getIndex();
@@ -90,6 +123,11 @@ class Emoji
         }, $string);
     }
 
+    /**
+     * @param string $string
+     *
+     * @return int
+     */
     public function countEmoji($string)
     {
         $index = $this->getIndex();

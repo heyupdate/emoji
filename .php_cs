@@ -5,6 +5,7 @@ use Symfony\CS\Finder\DefaultFinder;
 use Symfony\CS\FixerInterface;
 
 $finder = DefaultFinder::create();
+$finder->in(__DIR__.'/bin');
 $finder->in(__DIR__.'/src');
 $finder->in(__DIR__.'/tests');
 

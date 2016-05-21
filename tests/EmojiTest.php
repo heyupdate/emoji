@@ -2,14 +2,15 @@
 
 namespace HeyUpdate\Emoji;
 
+use HeyUpdate\Emoji\Index\CompiledIndex;
+
 class EmojiTest extends \PHPUnit_Framework_TestCase
 {
     public $emoji;
 
     public function setUp()
     {
-        $index = new EmojiIndex();
-        $this->emoji = new Emoji($index, 'http://twemoji.maxcdn.com/36x36/%s.png');
+        $this->emoji = new Emoji(new CompiledIndex(), 'http://twemoji.maxcdn.com/36x36/%s.png');
     }
 
     public function testEmojiReplacesUnicodeEmojiWithImage()
@@ -45,6 +46,6 @@ class EmojiTest extends \PHPUnit_Framework_TestCase
 
     public function testCountEmojiWithEmoji()
     {
-        $this->assertEquals(3, $this->emoji->countEmoji('Three emoji for you! ❤❤ :smile:'));
+        $this->assertSame(3, $this->emoji->countEmoji('Three emoji for you! ❤❤ :smile:'));
     }
 }
