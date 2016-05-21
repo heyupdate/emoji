@@ -68,6 +68,28 @@ class Emoji
         return $string;
     }
 
+    public function replaceNamedWithUnicode($string)
+    {
+        $index = $this->getIndex();
+
+        return preg_replace_callback($index->getEmojiNameRegex(), function ($matches) use ($index) {
+            $emoji = $index->findByName($matches[1]);
+
+            return $index->convertUnicodeToString($emoji['unicode']);
+        }, $string);
+    }
+
+    public function replaceUnicodeWithNamed($string)
+    {
+        $index = $this->getIndex();
+
+        return preg_replace_callback($index->getEmojiUnicodeRegex(), function ($matches) use ($index) {
+            $emoji = $index->findByUnicode($matches[0]);
+
+            return ':'.$emoji['name'].':';
+        }, $string);
+    }
+
     public function countEmoji($string)
     {
         $index = $this->getIndex();

@@ -113,7 +113,7 @@ class EmojiIndex
         return $this->emojiNameRegex;
     }
 
-    private function convertUnicodeToString($cp)
+    public function convertUnicodeToString($cp)
     {
         $cp = hexdec($cp);
 
