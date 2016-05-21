@@ -12,36 +12,36 @@ class Emoji
     protected $index;
 
     /**
-     * The sprintf format used to generate the asset URLs, e.g. "http://emojis.com/16x16/%s.png".
-     *
      * @var string
      */
-    protected $assetUrlFormat;
+    protected $imageHtmlTemplate;
 
     /**
      * @param IndexInterface $index
-     * @param string         $assetUrlFormat
+     * @param string         $imageHtmlTemplate
      */
-    public function __construct(IndexInterface $index, $assetUrlFormat)
-    {
+    public function __construct(
+        IndexInterface $index,
+        $imageHtmlTemplate = '<img alt=":{{name}}:" class="emoji" src="https://twemoji.maxcdn.com/36x36/{{unicode}}.png">'
+    ) {
         $this->setIndex($index);
-        $this->setAssetUrlFormat($assetUrlFormat);
+        $this->setImageHtmlTemplate($imageHtmlTemplate);
     }
 
     /**
      * @return string
      */
-    public function getAssetUrlFormat()
+    public function getImageHtmlTemplate()
     {
-        return $this->assetUrlFormat;
+        return $this->imageHtmlTemplate;
     }
 
     /**
-     * @param string $assetUrlFormat
+     * @param string $imageHtmlTemplate
      */
-    public function setAssetUrlFormat($assetUrlFormat)
+    public function setImageHtmlTemplate($imageHtmlTemplate)
     {
-        $this->assetUrlFormat = $assetUrlFormat;
+        $this->imageHtmlTemplate = $imageHtmlTemplate;
     }
 
     /**
@@ -69,26 +69,44 @@ class Emoji
     {
         $index = $this->getIndex();
 
-        // Build the format string for the <img>
-        $htmlFormat = '<img alt=":%s:" class="emoji" src="'.$this->getAssetUrlFormat().'">';
-
         // NB: Named emoji should be replaced first as the string will then contain them in the image alt tags
 
         // Replace named emoji, e.g. ":smile:"
-        $string = preg_replace_callback($index->getEmojiNameRegex(), function ($matches) use ($index, $htmlFormat) {
+        $string = preg_replace_callback($index->getEmojiNameRegex(), function ($matches) use ($index) {
             $emoji = $index->findByName($matches[1]);
 
-            return sprintf($htmlFormat, $emoji['name'], $emoji['unicode']);
+            return $this->renderTemplate($emoji);
         }, $string);
 
         // Replace unicode emoji
-        $string = preg_replace_callback($index->getEmojiUnicodeRegex(), function ($matches) use ($index, $htmlFormat) {
+        $string = preg_replace_callback($index->getEmojiUnicodeRegex(), function ($matches) use ($index) {
             $emoji = $index->findByUnicode($matches[0]);
 
-            return sprintf($htmlFormat, $emoji['name'], $emoji['unicode']);
+            return $this->renderTemplate($emoji);
         }, $string);
 
         return $string;
+    }
+
+    /**
+     * @param array $emoji
+     * @return string
+     */
+    private function renderTemplate(array $emoji)
+    {
+        return str_replace(
+            [
+                '{{name}}',
+                '{{unicode}}',
+                '{{description}}',
+            ],
+            [
+                $emoji['name'],
+                $emoji['unicode'],
+                $emoji['description'],
+            ],
+            $this->imageHtmlTemplate
+        );
     }
 
     /**

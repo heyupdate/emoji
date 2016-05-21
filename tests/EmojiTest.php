@@ -10,19 +10,19 @@ class EmojiTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->emoji = new Emoji(new CompiledIndex(), 'http://twemoji.maxcdn.com/36x36/%s.png');
+        $this->emoji = new Emoji(new CompiledIndex());
     }
 
     public function testEmojiReplacesUnicodeEmojiWithImage()
     {
         $replacedString = $this->emoji->replaceEmojiWithImages('I ❤ Emoji');
-        $this->assertSame('I <img alt=":heart:" class="emoji" src="http://twemoji.maxcdn.com/36x36/2764.png"> Emoji', $replacedString);
+        $this->assertSame('I <img alt=":heart:" class="emoji" src="https://twemoji.maxcdn.com/36x36/2764.png"> Emoji', $replacedString);
     }
 
     public function testEmojiReplacesNamedEmojiWithImage()
     {
         $replacedString = $this->emoji->replaceEmojiWithImages('Merry Christmas :santa:');
-        $this->assertSame('Merry Christmas <img alt=":santa:" class="emoji" src="http://twemoji.maxcdn.com/36x36/1f385.png">', $replacedString);
+        $this->assertSame('Merry Christmas <img alt=":santa:" class="emoji" src="https://twemoji.maxcdn.com/36x36/1f385.png">', $replacedString);
     }
 
     public function testReplaceNamedWithUnicode()
