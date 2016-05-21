@@ -15,11 +15,13 @@ class Emoji
      * @var string
      */
     protected $assetUrlFormat;
+    protected $htmlAttrs;
 
-    public function __construct(EmojiIndex $index, $assetUrlFormat)
+    public function __construct(EmojiIndex $index, $assetUrlFormat, $htmlAttrs = '')
     {
         $this->setIndex($index);
         $this->setAssetUrlFormat($assetUrlFormat);
+        $this->htmlAttrs = $htmlAttrs;
     }
 
     public function getAssetUrlFormat()
@@ -44,18 +46,19 @@ class Emoji
 
     public function replaceEmojiWithImages($string)
     {
+        $htmlFormat = '<img alt=":%s:" class="emoji" src="' . $this->assetUrlFormat . '"'.$this->htmlAttrs.'>';
+        return $this->replaceEmojiWithPattern($string, $htmlFormat);
+    }
+
+    protected function replaceEmojiWithPattern($string, $pattern){
         $index = $this->getIndex();
-
-        // Build the format string for the <img>
-        $htmlFormat = '<img alt=":%s:" class="emoji" src="' . $this->assetUrlFormat . '">';
-
         // NB: Named emoji should be replaced first as the string will then contain them in the image alt tags
 
         // Replace named emoji, e.g. ":smile:"
-        $string = preg_replace_callback($index->getEmojiNameRegex(), function ($matches) use ($index, $htmlFormat) {
+        $string = preg_replace_callback($index->getEmojiNameRegex(), function ($matches) use ($index, $pattern) {
             $emoji = $index->findByName($matches[1]);
 
-            return sprintf($htmlFormat, $emoji['name'], $emoji['unicode']);
+            return sprintf($pattern, $emoji['name'], $emoji['unicode']);
         }, $string);
 
         // Replace unicode emoji
@@ -66,6 +69,12 @@ class Emoji
         }, $string);
 
         return $string;
+
+    }
+    public function replaceEmojiWithMacros($string)
+    {
+        $htmlFormat = ':%s:';
+        return $this->replaceEmojiWithPattern($string, $htmlFormat);
     }
 
     public function replaceNamedWithUnicode($string)
