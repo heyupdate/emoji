@@ -93,7 +93,7 @@ class Emoji
     {
         $emoji = $this->index->findByName($name);
 
-        return $this->renderTemplate($emoji);
+        return $this->renderTemplate($emoji, $imageHtmlTemplate);
     }
 
     /**
@@ -106,7 +106,7 @@ class Emoji
     {
         $emoji = $this->index->findByUnicode($unicode);
 
-        return $this->renderTemplate($emoji);
+        return $this->renderTemplate($emoji, $imageHtmlTemplate);
     }
 
     /**
