@@ -67,25 +67,41 @@ class Emoji
      */
     public function replaceEmojiWithImages($string)
     {
-        $index = $this->getIndex();
-
         // NB: Named emoji should be replaced first as the string will then contain them in the image alt tags
 
         // Replace named emoji, e.g. ":smile:"
-        $string = preg_replace_callback($index->getEmojiNameRegex(), function ($matches) use ($index) {
-            $emoji = $index->findByName($matches[1]);
-
-            return $this->renderTemplate($emoji);
+        $string = preg_replace_callback($this->getIndex()->getEmojiNameRegex(), function ($matches) {
+            return $this->getEmojiImageByName($matches[1]);
         }, $string);
 
         // Replace unicode emoji
-        $string = preg_replace_callback($index->getEmojiUnicodeRegex(), function ($matches) use ($index) {
-            $emoji = $index->findByUnicode($matches[0]);
-
-            return $this->renderTemplate($emoji);
+        $string = preg_replace_callback($this->getIndex()->getEmojiUnicodeRegex(), function ($matches) {
+            return $this->getEmojiImageByUnicode($matches[0]);
         }, $string);
 
         return $string;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public function getEmojiImageByName($name)
+    {
+        $emoji = $this->index->findByName($name);
+
+        return $this->renderTemplate($emoji);
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    public function getEmojiImageByUnicode($unicode)
+    {
+        $emoji = $this->index->findByUnicode($unicode);
+
+        return $this->renderTemplate($emoji);
     }
 
     /**
