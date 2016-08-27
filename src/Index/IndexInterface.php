@@ -26,4 +26,9 @@ interface IndexInterface
      * @return string
      */
     public function getEmojiNameRegex();
+
+    /**
+     * @return array
+     */
+    public function getEmojis();
 }

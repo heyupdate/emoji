@@ -1,17 +1,17 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use HeyUpdate\Emoji\UnicodeUtil;
 
-$configFile = __DIR__ . '/../config/index.json';
+$configFile = __DIR__.'/../config/index.json';
 
 $template = <<<'TEMPLATE'
 <?php
 
 namespace HeyUpdate\Emoji\Index;
 
-class CompiledIndex extends EmojiIndex
+class CompiledIndex extends BaseIndex
 {
     /**
      * @var array
@@ -51,7 +51,7 @@ if ($emojis === false) {
 
 $emojiNames = [];
 $emojiUnicodes = [];
-$emojiUnicodeRegexParts = array();
+$emojiUnicodeRegexParts = [];
 foreach ($emojis as $index => $emoji) {
     if (isset($emoji['name'])) {
         // Create a map of emoji names to the hash index
@@ -86,7 +86,7 @@ $emojiNameRegex = sprintf('/:(%s):/', implode('|', array_map(function ($name) {
     return preg_quote($name, '/');
 }, array_keys($emojiNames))));
 
-print str_replace(
+echo str_replace(
     [
         '{{emojis}}',
         '{{emojiNames}}',

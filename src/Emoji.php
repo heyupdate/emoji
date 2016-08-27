@@ -90,6 +90,7 @@ class Emoji
 
     /**
      * @param array $emoji
+     *
      * @return string
      */
     private function renderTemplate(array $emoji)

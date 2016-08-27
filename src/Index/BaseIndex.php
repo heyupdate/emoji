@@ -67,4 +67,12 @@ class BaseIndex implements IndexInterface
     {
         return $this->emojiNameRegex;
     }
+
+    /**
+     * @return array
+     */
+    public function getEmojis()
+    {
+        return $this->emojis;
+    }
 }
