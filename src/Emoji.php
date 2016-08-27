@@ -62,21 +62,22 @@ class Emoji
 
     /**
      * @param string $string
+     * @param string $imageHtmlTemplate
      *
      * @return string
      */
-    public function replaceEmojiWithImages($string)
+    public function replaceEmojiWithImages($string, $imageHtmlTemplate = null)
     {
         // NB: Named emoji should be replaced first as the string will then contain them in the image alt tags
 
         // Replace named emoji, e.g. ":smile:"
-        $string = preg_replace_callback($this->getIndex()->getEmojiNameRegex(), function ($matches) {
-            return $this->getEmojiImageByName($matches[1]);
+        $string = preg_replace_callback($this->getIndex()->getEmojiNameRegex(), function ($matches) use ($imageHtmlTemplate) {
+            return $this->getEmojiImageByName($matches[1], $imageHtmlTemplate);
         }, $string);
 
         // Replace unicode emoji
-        $string = preg_replace_callback($this->getIndex()->getEmojiUnicodeRegex(), function ($matches) {
-            return $this->getEmojiImageByUnicode($matches[0]);
+        $string = preg_replace_callback($this->getIndex()->getEmojiUnicodeRegex(), function ($matches) use ($imageHtmlTemplate) {
+            return $this->getEmojiImageByUnicode($matches[0], $imageHtmlTemplate);
         }, $string);
 
         return $string;
@@ -84,9 +85,11 @@ class Emoji
 
     /**
      * @param string $name
+     * @param string $imageHtmlTemplate
+     *
      * @return string
      */
-    public function getEmojiImageByName($name)
+    public function getEmojiImageByName($name, $imageHtmlTemplate = null)
     {
         $emoji = $this->index->findByName($name);
 
@@ -95,9 +98,11 @@ class Emoji
 
     /**
      * @param string $name
+     * @param string $imageHtmlTemplate
+     *
      * @return string
      */
-    public function getEmojiImageByUnicode($unicode)
+    public function getEmojiImageByUnicode($unicode, $imageHtmlTemplate = null)
     {
         $emoji = $this->index->findByUnicode($unicode);
 
@@ -106,10 +111,11 @@ class Emoji
 
     /**
      * @param array $emoji
+     * @param string $imageHtmlTemplate
      *
      * @return string
      */
-    private function renderTemplate(array $emoji)
+    private function renderTemplate(array $emoji, $imageHtmlTemplate = null)
     {
         return str_replace(
             [
@@ -122,7 +128,7 @@ class Emoji
                 $emoji['unicode'],
                 $emoji['description'],
             ],
-            $this->imageHtmlTemplate
+            $imageHtmlTemplate !== null ? $imageHtmlTemplate : $this->imageHtmlTemplate
         );
     }
 
