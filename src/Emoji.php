@@ -22,7 +22,7 @@ class Emoji
      */
     public function __construct(
         IndexInterface $index,
-        $imageHtmlTemplate = '<img alt=":{{name}}:" class="emoji" src="https://twemoji.maxcdn.com/36x36/{{unicode}}.png">'
+        $imageHtmlTemplate = '<img alt="{{name}}" class="emoji" src="https://twemoji.maxcdn.com/2/72x72/{{unicode}}.png">'
     ) {
         $this->setIndex($index);
         $this->setImageHtmlTemplate($imageHtmlTemplate);
@@ -72,7 +72,7 @@ class Emoji
 
         // Replace named emoji, e.g. ":smile:"
         $string = preg_replace_callback($this->getIndex()->getEmojiNameRegex(), function ($matches) use ($imageHtmlTemplate) {
-            return $this->getEmojiImageByName($matches[1], $imageHtmlTemplate);
+            return $this->getEmojiImageByName($this->normalizeName($matches[0]), $imageHtmlTemplate);
         }, $string);
 
         // Replace unicode emoji
@@ -110,7 +110,7 @@ class Emoji
     }
 
     /**
-     * @param array $emoji
+     * @param array  $emoji
      * @param string $imageHtmlTemplate
      *
      * @return string
@@ -142,7 +142,7 @@ class Emoji
         $index = $this->getIndex();
 
         return preg_replace_callback($index->getEmojiNameRegex(), function ($matches) use ($index) {
-            $emoji = $index->findByName($matches[1]);
+            $emoji = $index->findByName($this->normalizeName($matches[0]));
 
             return UnicodeUtil::convertUnicodeToString($emoji['unicode']);
         }, $string);
@@ -174,5 +174,15 @@ class Emoji
         $index = $this->getIndex();
 
         return preg_match_all($index->getEmojiNameRegex(), $string) + preg_match_all($index->getEmojiUnicodeRegex(), $string);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    private function normalizeName($name)
+    {
+        return str_replace(':', '', str_replace('::', ' ', $name));
     }
 }

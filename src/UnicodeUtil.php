@@ -36,7 +36,7 @@ class UnicodeUtil
         for ($i = 0; $i < strlen($string); ++$i) {
             $char = ord(substr($string, $i, 1));
             if ($char >= 0x20 && $char < 0x80 && !in_array($char, [34, 39, 92], true)) {
-                $out .= chr($char);
+                $out .= preg_quote(chr($char), '/');
             } else {
                 $out .= sprintf('\\x%02x', $char);
             }

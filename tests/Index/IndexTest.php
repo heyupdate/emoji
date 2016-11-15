@@ -19,7 +19,6 @@ class IndexTest extends \PHPUnit_Framework_TestCase
             'unicode' => '1f623',
             'name' => 'persevere',
             'description' => 'persevering face',
-            'aliases' => [],
         ], $this->index->findByUnicode('😣'));
     }
 
@@ -34,7 +33,6 @@ class IndexTest extends \PHPUnit_Framework_TestCase
             'unicode' => '1f62b',
             'name' => 'tired_face',
             'description' => 'tired face',
-            'aliases' => [],
         ], $this->index->findByName('tired_face'));
     }
 

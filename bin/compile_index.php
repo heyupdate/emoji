@@ -44,30 +44,73 @@ if (!is_file($configFile)) {
     throw new InvalidArgumentException(sprintf('The emoji config file "%s" does not exist', $configFile));
 }
 
-$emojis = json_decode(file_get_contents($configFile), true);
-if ($emojis === false) {
+$data = json_decode(file_get_contents($configFile), true);
+if ($data === false) {
     throw new InvalidArgumentException(sprintf('Unable to parse the emoji config file "%s"', $configFile));
 }
 
+$index = 0;
+$emojis = [];
 $emojiNames = [];
 $emojiUnicodes = [];
 $emojiUnicodeRegexParts = [];
-foreach ($emojis as $index => $emoji) {
-    if (isset($emoji['name'])) {
-        // Create a map of emoji names to the hash index
-        $emojiNames[$emoji['name']] = $index;
-    }
 
-    if (isset($emoji['aliases'])) {
-        foreach ($emoji['aliases'] as $alias) {
-            // Create a map of emoji names to the hash index
-            $emojiNames[$alias] = $index;
+$skinTones = [];
+foreach ($data as $emoji) {
+    if ($emoji['category'] === 'Skin Tones') {
+        $skinTones[$emoji['unified']] = $emoji;
+    }
+}
+
+foreach ($data as $emoji) {
+    if ($emoji['has_img_twitter']) {
+        if (isset($emoji['skin_variations'])) {
+            foreach ($emoji['skin_variations'] as $variation) {
+                if ($variation['has_img_twitter']) {
+                    $unicodeParts = explode('-', $variation['unified']);
+                    $skinTone = $skinTones[$unicodeParts[count($unicodeParts) - 1]];
+
+                    $emojis[$index] = [
+                        'unicode' => strtolower($variation['unified']),
+                        'name' => $emoji['short_name'].' '.$skinTone['short_name'],
+                        'description' => strtolower($emoji['name']).' '.strtolower($skinTone['name']),
+                    ];
+
+                    foreach ($emoji['short_names'] as $shortName) {
+                        // Create a map of emoji names to the hash index
+                        $emojiNames[$shortName.' '.$skinTone['short_name']] = $index;
+                        $emojiNameRegexParts[] = preg_quote(':'.$shortName.'::'.$skinTone['short_name'].':', '/');
+                    }
+
+                    $string = '';
+                    foreach ($unicodeParts as $unicode) {
+                        // Get string from unicode parts
+                        $string .= UnicodeUtil::convertUnicodeToString($unicode);
+                    }
+
+                    // Create a map of unicode emoji characters to the hash index
+                    $emojiUnicodes[$string] = $index;
+                    $emojiUnicodeRegexParts[] = UnicodeUtil::formatRegexString($string);
+
+                    ++$index;
+                }
+            }
         }
-    }
 
-    if (isset($emoji['unicode'])) {
+        $emojis[$index] = [
+            'unicode' => strtolower($emoji['unified']),
+            'name' => $emoji['short_name'],
+            'description' => strtolower($emoji['name']),
+        ];
+
+        foreach ($emoji['short_names'] as $shortName) {
+            // Create a map of emoji names to the hash index
+            $emojiNames[$shortName] = $index;
+            $emojiNameRegexParts[] = preg_quote(':'.$shortName.':', '/');
+        }
+
         $string = '';
-        foreach (explode('-', $emoji['unicode']) as $unicode) {
+        foreach (explode('-', $emoji['unified']) as $unicode) {
             // Get string from unicode parts
             $string .= UnicodeUtil::convertUnicodeToString($unicode);
         }
@@ -75,16 +118,16 @@ foreach ($emojis as $index => $emoji) {
         // Create a map of unicode emoji characters to the hash index
         $emojiUnicodes[$string] = $index;
         $emojiUnicodeRegexParts[] = UnicodeUtil::formatRegexString($string);
+
+        ++$index;
     }
 }
 
 // Build the unicode regex
-$emojiUnicodeRegex = sprintf('/%s/', implode('|', $emojiUnicodeRegexParts));
+$emojiUnicodeRegex = '/'.implode('|', $emojiUnicodeRegexParts).'/';
 
 // Build the name regex
-$emojiNameRegex = sprintf('/:(%s):/', implode('|', array_map(function ($name) {
-    return preg_quote($name, '/');
-}, array_keys($emojiNames))));
+$emojiNameRegex = '/'.implode('|', $emojiNameRegexParts).'/';
 
 echo str_replace(
     [
